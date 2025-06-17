@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: leave_postgres
+    ports:
+      - "5005:5432"
+    environment:
+      POSTGRES_DB: leave_management
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend:
+    build: ./Backend
+    container_name: leave_backend
+    ports:
+      - "3008:3008"
+    depends_on:
+      - postgres
+
+  employee_leave:
+    build: ./Employee-leave
+    container_name: leave_employee_ui
+    ports:
+      - "8009:80"
+    depends_on:
+      - backend
+
+  hr_leave:
+    build: ./HR-leave
+    container_name: leave_hr_ui
+    ports:
+      - "8010:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+
